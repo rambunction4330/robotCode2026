@@ -55,6 +55,7 @@ public class SparkMaxPositionController {
         this.info = info;
         SparkMaxConfig config = new SparkMaxConfig();
         sparkMax = new SparkMax(info.motorConfig.id, info.motorConfig.type);
+        
 
         config.smartCurrentLimit(info.motorConfig.maxCurrent);
         config.inverted(info.motorConfig.inverted);

@@ -61,6 +61,8 @@ public class TurretSubsystem extends SubsystemBase {
         // diffs.add(currentTargetDiff);
       }
     }
+
+    SmartDashboard.putNumber("Smallest Angle", targetSmallestPos/360);
     // int indexOfMin = diffs.indexOf(Collections.min(diffs));
 
     // Add feedforeward of inversion of robot rotation speed(rad/s??)

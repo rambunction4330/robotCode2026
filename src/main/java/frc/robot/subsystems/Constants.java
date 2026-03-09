@@ -97,11 +97,11 @@ public final class Constants {
     /// Turret Constants
     static SparkMaxPositionController turret = new SparkMaxPositionController(new sparkPcreateInfo(
         new sparkPMotorConfig(56, SparkLowLevel.MotorType.kBrushless, false, 0), 
-        new sparkPpidConfig(3, 0, 0, 0, 0, 1, -1), 
+        new sparkPpidConfig(0.5, 0, 0, 0, 0, 1, -1), 
         null, 
-        new sparkPrange(false, Angle.ofBaseUnits(-10, Rotations), Angle.ofBaseUnits(10, Rotations)), 
+        new sparkPrange(false, Rotations.of(-100), Rotations.of(100)), 
         new sparkPfeedBack(FeedbackSensor.kPrimaryEncoder, turretConstants.kGearRatio),
-        new sparkPprofiling(false, RotationsPerSecond.of(10000), RotationsPerSecondPerSecond.of(100000))));
+        new sparkPprofiling(false, RotationsPerSecond.of(0), RotationsPerSecondPerSecond.of(0))));
 
   }
 
@@ -110,7 +110,7 @@ public final class Constants {
   }
 
   public static class turretConstants {
-    public static double kGearRatio = 1/(100/10 * 3/1);
+    public static double kGearRatio =1;  //(100/10 * 3/1);
     public static double kMinAngle = -200;
     public static double kMaxAngle = 200;
   }

@@ -55,8 +55,8 @@ public class TurretAllignCommand extends Command {
     // Minus Robot Rotation from vector math angle to get the turret angle setpoint - Peine
     Rotation2d targetRot = distanceVec.getAngle().minus(drivetrain.getState().Pose.getRotation()); 
 
-  SmartDashboard.putNumber("TargetRotTurret", targetRot.getMeasure().magnitude());
-  SmartDashboard.putNumber("currentTurretPosition", Radians.of(turretSubsystem.getTurret().getPosition().magnitude()).magnitude());
+  SmartDashboard.putNumber("TargetRotTurret", targetRot.getRotations());
+  SmartDashboard.putNumber("currentTurretPosition", turretSubsystem.getTurret().getPosition().magnitude());
     turretSubsystem.setTurretPosition(Rotations.of(targetRot.getRotations()), m_robotSpeedsSup.get().omegaRadiansPerSecond);
 
   }

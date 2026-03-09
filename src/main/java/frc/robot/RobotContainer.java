@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.AllignToPoseCommand;
 import frc.robot.commands.ShooterTuning;
 import frc.robot.commands.TurretAllignCommand;
 import frc.robot.generated.TunerConstants;
@@ -70,6 +73,8 @@ public class RobotContainer {
 
     public final ShooterSubsystem shooter = new ShooterSubsystem(joystick);
 
+     
+
     // private final TurretSubsystem m_turret = new TurretSubsystem(joystick);
 
     public RobotContainer() {
@@ -104,15 +109,16 @@ public class RobotContainer {
 
         indexer.setDefaultCommand(indexer.Stop());
         shooter.setDefaultCommand(shooter.shootCommand(RotationsPerSecond.of(0)));
-        joystick.b().whileTrue(indexer.kickCommand(RotationsPerSecond.of(-5)));
+       // joystick.b().whileTrue(indexer.kickCommand(RotationsPerSecond.of(-5)));
         joystick.x().whileTrue(shooter.shootCommand(RotationsPerSecond.of(30)));
         joystick.y().whileTrue(new TurretAllignCommand(turret, drivetrain,()-> drivetrain.getState().Speeds));
+        //[joystick.b().whileTrue(new AllignToPoseCommand(drivetrain, joystick));
         //joystick.y().whileTrue(turret.setTurretCommand(Rotations.of(0.4)));
         //turret.setDefaultCommand(new TurretAllignCommand(turret, drivetrain, ()-> drivetrain.getState().Speeds));
         // joystickOtherForIntake.b().whileFalse(indexer.kickCommand(RotationsPerSecond.of(0)));
         // joystickOtherForIntake.x().whileFalse(
         // shooter.shootCommand(RotationsPerSecond.of(0)));
-
+        
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
