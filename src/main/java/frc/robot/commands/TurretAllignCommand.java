@@ -12,6 +12,9 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -24,8 +27,10 @@ public class TurretAllignCommand extends Command {
 
   private TurretSubsystem turretSubsystem;
   private CommandSwerveDrivetrain drivetrain; 
-  private Translation2d hubVec = new Translation2d(4, 4.5);
-  private Translation2d centerToTurret = new Translation2d(0.5, 0.5);
+  private Translation2d hubVec_Blue = new Translation2d(182.11*.0254, 158.84*.0254);
+  private Translation2d hubVec_Red = new Translation2d(469.11*.0254, 158.84*.0254);
+  private Translation2d centerToTurret = new Translation2d(-5.197*.0254, -5*.0254);
+  private Translation2d hubVec;
   private Supplier<ChassisSpeeds> m_robotSpeedsSup;
 
 
@@ -35,6 +40,12 @@ public class TurretAllignCommand extends Command {
     this.drivetrain = drivetrain; 
     this.m_robotSpeedsSup = robotSpeedsSup;
     super.addRequirements(turretSubsystem);
+
+    hubVec = hubVec_Blue;
+    
+    if (DriverStation.getAlliance().get() == Alliance.Red) {
+      hubVec = hubVec_Red;
+    }
   }
 
   // Called when the command is initially scheduled.
@@ -44,6 +55,9 @@ public class TurretAllignCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (DriverStation.getAlliance().get() == Alliance.Red) {
+      hubVec = hubVec_Red;
+    }
 
     Rotation2d currentRobotRot = drivetrain.getState().Pose.getRotation(); 
     Translation2d currentRobotVec = drivetrain.getState().Pose.getTranslation();
@@ -56,8 +70,8 @@ public class TurretAllignCommand extends Command {
     Rotation2d targetRot = distanceVec.getAngle().minus(drivetrain.getState().Pose.getRotation()); 
 
   SmartDashboard.putNumber("TargetRotTurret", targetRot.getRotations());
-  SmartDashboard.putNumber("currentTurretPosition", turretSubsystem.getTurret().getPosition().magnitude());
-    turretSubsystem.setTurretPosition(Rotations.of(targetRot.getRotations()), m_robotSpeedsSup.get().omegaRadiansPerSecond);
+  //SmartDashboard.putNumber("currentTurretPosition", turretSubsystem.getTurret().getPosition().magnitude());
+    turretSubsystem.setTurretPosition(Rotations.of(-targetRot.getRotations()-.5), .12*m_robotSpeedsSup.get().omegaRadiansPerSecond);
 
   }
 

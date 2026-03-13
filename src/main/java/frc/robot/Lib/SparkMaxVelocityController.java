@@ -1,6 +1,5 @@
 package frc.robot.Lib;
 
-
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Objects;
@@ -19,39 +18,40 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class SparkMaxVelocityController {
-    private  SparkMax sparkMax;
+    private SparkMax sparkMax;
 
     private final ControlType controlType;
 
     private final sparkVcreateInfo info;
 
-    public record  sparkVmotorConfig(int id, SparkLowLevel.MotorType type, boolean inverted,
+    public record sparkVmotorConfig(int id, SparkLowLevel.MotorType type, boolean inverted,
             int maxCurrent) {
     }
 
-    public record  sparkVpidConfig(double p, double i, double d, double iZone,
+    public record sparkVpidConfig(double p, double i, double d, double iZone,
             double iMaxAccumulator, double maxOutput, double minOutput) {
     }
 
-    public record  sparkVfeedBack(FeedbackSensor encoderType, double gearRatio) {
+    public record sparkVfeedBack(FeedbackSensor encoderType, double gearRatio) {
     }
 
-    public record  sparkVprofiling(boolean usingMaxMotion, AngularVelocity maxVelocity, AngularAcceleration maxAcceleration) {
+    public record sparkVprofiling(boolean usingMaxMotion, AngularVelocity maxVelocity,
+            AngularAcceleration maxAcceleration) {
     }
 
-    public record  sparkVcreateInfo( sparkVmotorConfig motorConfig,  sparkVpidConfig pidConfig,
-            SparkMaxVelocityController leader,  sparkVfeedBack feedBack,  sparkVprofiling profileConfig) {
+    public record sparkVcreateInfo(sparkVmotorConfig motorConfig, sparkVpidConfig pidConfig,
+            SparkMaxVelocityController leader, sparkVfeedBack feedBack, sparkVprofiling profileConfig) {
     }
 
-    public SparkMaxVelocityController( sparkVcreateInfo info) {
+    public SparkMaxVelocityController(sparkVcreateInfo info) {
 
         this.info = info;
         SparkMaxConfig config = new SparkMaxConfig();
         sparkMax = new SparkMax(info.motorConfig.id, info.motorConfig.type);
 
-        config.smartCurrentLimit(info.motorConfig.maxCurrent);
+        config.smartCurrentLimit(info.motorConfig.maxCurrent, info.motorConfig.maxCurrent);
         config.inverted(info.motorConfig.inverted);
-        //config.encoder.countsPerRevolution(42);
+        // config.encoder.countsPerRevolution(42);
 
         config.closedLoop.feedbackSensor(info.feedBack.encoderType);
         config.closedLoop.pid(info.pidConfig.p, info.pidConfig.i, info.pidConfig.d);
@@ -60,8 +60,7 @@ public class SparkMaxVelocityController {
         config.closedLoop.maxOutput(info.pidConfig.maxOutput);
         config.closedLoop.minOutput(info.pidConfig.minOutput);
 
-
-        if (Objects.isNull(info.feedBack.gearRatio) || info.feedBack.gearRatio != 0.0) {
+        if (!Objects.isNull(info.feedBack.gearRatio) && info.feedBack.gearRatio != 0.0) {
             config.encoder.velocityConversionFactor(info.feedBack.gearRatio);
         }
 
@@ -70,12 +69,12 @@ public class SparkMaxVelocityController {
             config.closedLoop.maxMotion
                     .maxVelocity(info.profileConfig.maxVelocity.magnitude());
             config.closedLoop.maxMotion
-                    .maxAcceleration(info.profileConfig.maxAcceleration.magnitude() );
+                    .maxAcceleration(info.profileConfig.maxAcceleration.magnitude());
         } else {
             controlType = SparkBase.ControlType.kVelocity;
         }
 
-        //config.follow(info.leader.getMotor(), info.leader.info.motorConfig.inverted);
+        // config.follow(info.leader.getMotor(), info.leader.info.motorConfig.inverted);
 
         sparkMax.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
@@ -85,8 +84,8 @@ public class SparkMaxVelocityController {
         sparkMax.getClosedLoopController().setSetpoint(targetVelocity.magnitude(), controlType);
     }
 
-    public AngularVelocity getVelocity(){
-       return RotationsPerSecond.of(sparkMax.getEncoder().getVelocity()); 
+    public AngularVelocity getVelocity() {
+        return RotationsPerSecond.of(sparkMax.getEncoder().getVelocity());
     }
 
     public void setPower(double power) {

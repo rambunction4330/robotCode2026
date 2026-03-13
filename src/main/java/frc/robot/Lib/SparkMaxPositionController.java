@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 public class SparkMaxPositionController {
 
-    private final SparkMax sparkMax;
+    public SparkMax sparkMax;
 
     private final ControlType controlType;
 
@@ -56,8 +56,10 @@ public class SparkMaxPositionController {
         SparkMaxConfig config = new SparkMaxConfig();
         sparkMax = new SparkMax(info.motorConfig.id, info.motorConfig.type);
         
-
+        if (!Objects.isNull(info.motorConfig.maxCurrent)) {
         config.smartCurrentLimit(info.motorConfig.maxCurrent);
+        }
+
         config.inverted(info.motorConfig.inverted);
         // config.encoder.countsPerRevolution(42);
 
@@ -78,10 +80,10 @@ public class SparkMaxPositionController {
         if (info.range.isContinuous) {
             config.closedLoop.positionWrappingEnabled(true);
 
-            if (!Objects.isNull(info.range.minPosition.magnitude())
-                    && !Objects.isNull(info.range.maxPosition.magnitude())) {
-                config.closedLoop.positionWrappingInputRange(info.range.minPosition.magnitude(),
-                        info.range.maxPosition.magnitude());
+            if (!Objects.isNull(info.range.minPosition)
+                    && !Objects.isNull(info.range.maxPosition)) {
+                config.closedLoop.positionWrappingInputRange(info.range.minPosition.in(Rotations),
+                        info.range.maxPosition.in(Rotations));
             }
         }
 
@@ -104,33 +106,21 @@ public class SparkMaxPositionController {
     public void setPosition(Angle position, double ff) {
         Angle targetPos;
 
-        if (!Objects.isNull(info.range.minPosition.magnitude())
-                && !Objects.isNull(info.range.maxPosition.magnitude())) {
+        if (!Objects.isNull(info.range.minPosition)
+                && !Objects.isNull(info.range.maxPosition)) {
 
             targetPos = Angle.ofBaseUnits(MathUtil.clamp(position.magnitude(), info.range.minPosition.magnitude(),
                     info.range.maxPosition.magnitude()), Rotations);
         } else {
             targetPos = position;
         }
-        sparkMax.getClosedLoopController().setSetpoint(targetPos.magnitude(), controlType,
+        sparkMax.getClosedLoopController().setSetpoint(targetPos.in(Rotations), controlType,
                 ClosedLoopSlot.kSlot0, ff);
 
     }
 
     public void setPosition(Angle position) {
-        Angle targetPos;
-
-        if (!Objects.isNull(info.range.minPosition.magnitude())
-                && !Objects.isNull(info.range.maxPosition.magnitude())) {
-
-            targetPos = Angle.ofBaseUnits(MathUtil.clamp(position.magnitude(), info.range.minPosition.magnitude(),
-                    info.range.maxPosition.magnitude()), Rotations);
-        } else {
-            targetPos = position;
-        }
-
-        sparkMax.getClosedLoopController().setSetpoint(targetPos.magnitude(), controlType,
-                ClosedLoopSlot.kSlot0);
+        setPosition(position, 0);
 
     }
 
@@ -140,7 +130,7 @@ public class SparkMaxPositionController {
     }
 
     public void setEncoderPosition(Angle position) {
-        sparkMax.getEncoder().setPosition(position.magnitude());
+        sparkMax.getEncoder().setPosition(position.in(Rotations));
     }
 
     public void setPower(double power) {

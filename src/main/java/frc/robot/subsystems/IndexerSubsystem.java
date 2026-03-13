@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -40,25 +41,37 @@ public class IndexerSubsystem extends SubsystemBase {
     kicker.setVelocity(velocity);
   }
 
-//Combine these next commands later
-  public Command kickCommand(AngularVelocity velocity) {
+  // Combine these next commands later
+  // public Command kickCommand(AngularVelocity velocity) {
+  //   return new RunCommand(() -> {
+  //     setKickerVelocity(velocity);
+  //   }, this);
+  // }
+
+  // public Command kickVoltage(double voltage) {
+  //   return new RunCommand(() -> {
+  //     kicker.getMotor().setVoltage(voltage);
+  //   }, this);
+  // }
+
+  public void setIndexVol(double voltage) {
+      indexer.getMotor().setVoltage(voltage);
+  }
+
+  public Command kickAndIndex(AngularVelocity kickVel, double indexerVol){
+  return new RunCommand(
+    ()-> {
+      setKickerVelocity(kickVel);
+      setIndexVol(indexerVol);
+    }
+  );
+  }
+
+  public Command Stop() {
     return new RunCommand(() -> {
-      setKickerVelocity(velocity);
+      indexer.stop();
+      kicker.stop();
     }, this);
-  }
-
-  public Command kickVoltage(double voltage){
-    return new RunCommand(()->{kicker.getMotor().setVoltage(voltage);}, this);
-  }
-
-  public Command RunIndexer(AngularVelocity velocity) {
-    return new InstantCommand(() -> {
-      setIndexterVelocity(velocity);
-    }, this);
-  }
-
-  public Command Stop(){
-    return new RunCommand(()->{kicker.stop();}, this);
   }
 
 }

@@ -37,6 +37,9 @@ public class TurretSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("currentEncoderReading", turret.getPosition().in(Rotations));
+    SmartDashboard.putNumber("Current Setpoint", Rotations.of(turret.sparkMax.getClosedLoopController().getSetpoint()).magnitude());
+    //SmartDashboard.putNumber("Gear Ratio", turret.getGearRatio());
   }
 
   // need to insert some logic to get closest angle due to turret overlap
@@ -46,28 +49,30 @@ public class TurretSubsystem extends SubsystemBase {
     // ArrayList<Double> angles = new ArrayList<Double>();
     // ArrayList<Double> diffs = new ArrayList<Double>();
 
-    double smallestDiff = 2000000000;
-    double targetSmallestPos = 45;
+SmartDashboard.putNumber("Pos",pos.in(Rotations));
+
+    double smallestDiff = 10000.0;
+    double targetSmallestPos = 0.0;
 
     for (int i = -2; i < 3; i++) {
-      double testAngle = pos.in(Degrees) + (360 * i);
-      if ((turretConstants.kMinAngle <= testAngle) && (testAngle <= turretConstants.kMaxAngle)) {
+      double testAngle = pos.in(Rotations) + i*1.0;
+      //if ((turretConstants.kMinAngle < testAngle) && (testAngle < turretConstants.kMaxAngle)) {
         // angles.add(testAngle);
-        double currentTargetDiff = Math.abs(turret.getPosition().in(Degrees) - testAngle);
+        double currentTargetDiff = Math.abs(turret.getPosition().in(Rotations) - testAngle);
         if (currentTargetDiff < smallestDiff) {
           smallestDiff = currentTargetDiff;
           targetSmallestPos = testAngle;
         }
         // diffs.add(currentTargetDiff);
-      }
+     // }
     }
 
-    SmartDashboard.putNumber("Smallest Angle", targetSmallestPos/360);
+    SmartDashboard.putNumber("Smallest Angle", targetSmallestPos);
     // int indexOfMin = diffs.indexOf(Collections.min(diffs));
 
     // Add feedforeward of inversion of robot rotation speed(rad/s??)
-    SmartDashboard.putNumber("targetSmallestPos",targetSmallestPos);
-    turret.setPosition(Degrees.of(targetSmallestPos));//, -.12 * turretConstants.kGearRatio * robotRotSpeed_RadPerSec);
+    
+    turret.setPosition(Rotations.of(targetSmallestPos));//, -.12 * turretConstants.kGearRatio * robotRotSpeed_RadPerSec);
   }
 
   public void setTurretPosOrginal(Angle pos){

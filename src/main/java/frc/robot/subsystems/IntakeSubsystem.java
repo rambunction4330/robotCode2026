@@ -48,8 +48,17 @@ public class IntakeSubsystem extends SubsystemBase {
     arm.setPosition(Rotations.of(target));
   }
 
-  public void setRollersVelocity(double velocity_RotPerMin) {
-    rollers.setVelocity(RotationsPerSecond.of(velocity_RotPerMin));
+  public void setRollersVelocity(double velocity_RotPerSec) {
+    rollers.setVelocity(RotationsPerSecond.of(velocity_RotPerSec));
+    if (velocity_RotPerSec == 0) {
+      rollers.stop();
+    }
+  }
+
+  public Command runRollers(double vel) {
+    return new RunCommand(() -> {
+      rollers.setVelocity(RotationsPerSecond.of(vel));
+    }, this);
   }
 
   public Command intakeCommand(Angle pos, double velocity_RotPerMin) {
@@ -59,4 +68,13 @@ public class IntakeSubsystem extends SubsystemBase {
           setRollersVelocity(velocity_RotPerMin);
         }, this);
   }
+
+  public Command Stop() {
+    return new RunCommand(
+        () -> {
+          arm.setPosition(Rotations.of(0));
+          rollers.stop();
+        }, this);
+
+  };
 }

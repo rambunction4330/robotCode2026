@@ -5,6 +5,9 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -28,6 +31,8 @@ public class ShooterSubsystem extends SubsystemBase {
     this.shooter = Constants.OperatorConstants.shooter;
     this.hood = Constants.OperatorConstants.hood;
     this.controller = controller;
+    Constants.hoodMapFunc();
+    Constants.shootMapFunc();
   }
 
   @Override
@@ -57,9 +62,9 @@ public class ShooterSubsystem extends SubsystemBase {
     hood.setPosition(Rotations.of(target));
   }
 
-  public Command rezeroHood(){
-    return new RunCommand(()->{
-     hood.setEncoderPosition(Rotations.of(0.0));
+  public Command rezeroHood() {
+    return new RunCommand(() -> {
+      hood.setEncoderPosition(Rotations.of(0.0));
     }, this);
   }
 
@@ -67,13 +72,29 @@ public class ShooterSubsystem extends SubsystemBase {
     return hood;
   }
 
+  public TalonFXVelocityController getShooter() {
+    return shooter;
+  }
 
-  public Command shootCommand(AngularVelocity velocity) {
+  public Command Stop(){
+    return new RunCommand(()->{hood.stop();
+    shooter.stop();}, this);
+  }
+
+  public Command shootCommand(AngularVelocity velocity){ //, Angle position) {
     return new RunCommand(() -> {
       setShootVelocity(velocity);
+      // setHoodPosition(position);
     }, this);
 
   }
 
-  
+  public Command shootCommand2(DoubleSupplier distance){
+   return new RunCommand(()->{
+    setShootVelocity(RotationsPerSecond.of(Constants.velocityMap.get(distance.getAsDouble())));
+    setHoodPosition(Rotations.of(Constants.hoodMap.get(distance.getAsDouble())));
+
+   }, this);
+  }
+
 }

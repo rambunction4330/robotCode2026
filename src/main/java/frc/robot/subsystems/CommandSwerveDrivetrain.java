@@ -26,12 +26,16 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -273,36 +277,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         boolean useMegTag2 = false;
         boolean doRejectUpdate = false;
+        PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");            
+        LimelightHelpers.SetRobotOrientation("limelight", this.getState().Pose.getRotation().getDegrees(), 0, 0, 0,0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
-        if (useMegTag2 == false) {
-            LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-            if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
-                if (mt1.rawFiducials[0].ambiguity > 0.7 || mt1.rawFiducials[0].distToCamera > 3) {
-                    doRejectUpdate = true;
-                }
-            }
-
-            if (mt1.tagCount == 0) {
-                doRejectUpdate = true;
-            }
-
-            if (!doRejectUpdate) {
-                addVisionMeasurement(mt1.pose, kNumConfigAttempts, VecBuilder.fill(0.5, 0.5, 9999999));
-            }
-        }
-
-        else if (useMegTag2 == true) {
-            LimelightHelpers.SetRobotOrientation("limelight", this.getState().Pose.getRotation().getDegrees(), 0, 0, 0,
-                    0, 0);
-            LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-            if (Math.abs(this.getState().Speeds.omegaRadiansPerSecond) > 12.5664) {
-                doRejectUpdate = true;
-            }
-            if (mt2.tagCount == 0) {
-                doRejectUpdate = true;
-            }
-            if (!doRejectUpdate) {
-                addVisionMeasurement(mt2.pose, kNumConfigAttempts, VecBuilder.fill(0.7, 0.7, 999999));
+        boolean goodPose = LimelightHelpers.validPoseEstimate(mt1);
+        SmartDashboard.putBoolean("Good LimeLight Reading", goodPose);
+        if(goodPose) {
+            if(mt1.avgTagArea > 0 && mt1.tagCount > 0){
+                addVisionMeasurement(mt1.pose, mt1.timestampSeconds, VecBuilder.fill(0.4, 0.35, 9999999));
             }
         }
 
@@ -398,5 +381,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
+    }
+
+    public Command resetPose() {
+        return new InstantCommand(()->{
+            if (DriverStation.getAlliance().get() == Alliance.Red){
+                this.resetPose(new Pose2d(480*.0254, 158.84*.0254, new Rotation2d().k180deg));
+            }
+            else {
+                this.resetPose(new Pose2d(170*.0254, 158.84*.0254, new Rotation2d()));
+            }
+        }, this);
     }
 }
