@@ -126,7 +126,7 @@ public class SparkMaxPositionController {
 
     public Angle getPosition() {
 
-        return Angle.ofBaseUnits(sparkMax.getEncoder().getPosition(), Rotations);
+        return Rotations.of(sparkMax.getEncoder().getPosition());
     }
 
     public void setEncoderPosition(Angle position) {

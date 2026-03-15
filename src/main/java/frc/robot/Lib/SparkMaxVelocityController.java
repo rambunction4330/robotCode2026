@@ -1,6 +1,7 @@
 package frc.robot.Lib;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import java.util.Objects;
 
@@ -67,9 +68,9 @@ public class SparkMaxVelocityController {
         if (info.profileConfig.usingMaxMotion) {
             controlType = SparkBase.ControlType.kMAXMotionVelocityControl;
             config.closedLoop.maxMotion
-                    .maxVelocity(info.profileConfig.maxVelocity.magnitude());
+                    .maxVelocity(info.profileConfig.maxVelocity.in(RotationsPerSecond)*60);
             config.closedLoop.maxMotion
-                    .maxAcceleration(info.profileConfig.maxAcceleration.magnitude());
+                    .maxAcceleration(info.profileConfig.maxAcceleration.in(RotationsPerSecondPerSecond));
         } else {
             controlType = SparkBase.ControlType.kVelocity;
         }
@@ -80,8 +81,8 @@ public class SparkMaxVelocityController {
     }
 
     public void setVelocity(AngularVelocity velocity) {
-        AngularVelocity targetVelocity = AngularVelocity.ofBaseUnits(velocity.magnitude(), RotationsPerSecond);
-        sparkMax.getClosedLoopController().setSetpoint(targetVelocity.magnitude(), controlType);
+        //AngularVelocity targetVelocity = AngularVelocity.ofBaseUnits(velocity.magnitude(), RotationsPerSecond);
+        sparkMax.getClosedLoopController().setSetpoint(velocity.in(RotationsPerSecond)*60, controlType);
     }
 
     public AngularVelocity getVelocity() {

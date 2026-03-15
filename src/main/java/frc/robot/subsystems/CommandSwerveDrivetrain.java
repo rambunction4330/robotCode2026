@@ -21,6 +21,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -284,8 +285,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         boolean goodPose = LimelightHelpers.validPoseEstimate(mt1);
         SmartDashboard.putBoolean("Good LimeLight Reading", goodPose);
         if(goodPose) {
-            if(mt1.avgTagArea > 0 && mt1.tagCount > 0){
-                addVisionMeasurement(mt1.pose, mt1.timestampSeconds, VecBuilder.fill(0.4, 0.35, 9999999));
+            double avgTagArea = mt1.avgTagArea;
+            if(mt1.avgTagArea > .05 && mt1.tagCount > 0){
+                addVisionMeasurement(mt1.pose, mt1.timestampSeconds, VecBuilder.fill(.7/avgTagArea, .7/avgTagArea, 9999999));
+                addVisionMeasurement(mt2.pose, mt2.timestampSeconds, VecBuilder.fill(.7/avgTagArea, .7/avgTagArea, 9999999));
             }
         }
 
@@ -392,5 +395,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 this.resetPose(new Pose2d(170*.0254, 158.84*.0254, new Rotation2d()));
             }
         }, this);
+    }
+
+    public Rotation2d getRotToTarget(Translation2d target){
+
+
+    // Minus Robot Rotation from vector math angle to get the turret angle setpoint - Peine
+        Rotation2d targetRot = getDistToTarget(target).getAngle().minus(getState().Pose.getRotation()); 
+
+        
+        return targetRot;
+    }
+
+    public Translation2d getDistToTarget(Translation2d target){
+        Rotation2d currentRobotRot = getState().Pose.getRotation(); 
+        Translation2d currentRobotVec = getState().Pose.getTranslation();
+
+        Translation2d adjustedTurretVec = Constants.centerToTurret.rotateBy(currentRobotRot);
+        adjustedTurretVec =  adjustedTurretVec.plus(currentRobotVec);
+        Translation2d distanceVec = target.minus(adjustedTurretVec);
+        SmartDashboard.putNumber("Turret Dist", distanceVec.getNorm());
+        return distanceVec;
     }
 }

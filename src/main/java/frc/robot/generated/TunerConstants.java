@@ -68,7 +68,7 @@ public class TunerConstants {
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
     
 
-    private static final MountPoseConfigs pigeonMountConfig = new MountPoseConfigs().withMountPosePitch(0).withMountPoseRoll(0).withMountPoseYaw(90);
+    private static final MountPoseConfigs pigeonMountConfig = new MountPoseConfigs().withMountPosePitch(0).withMountPoseRoll(0).withMountPoseYaw(0);
     private static final GyroTrimConfigs pigeonGyroTrimConfig = new GyroTrimConfigs().withGyroScalarZ(0);
     private static final Pigeon2Configuration pigeonConfigs = new Pigeon2Configuration().withMountPose(pigeonMountConfig);
 
@@ -86,8 +86,8 @@ public class TunerConstants {
     // This may need to be tuned to your individual robot
     private static final double kCoupleRatio = 3.8181818181818183;
 
-    private static final double kDriveGearRatio = 7.363636363636365;
-    private static final double kSteerGearRatio = 15.42857142857143;
+    private static final double kDriveGearRatio = 6.72;
+    private static final double kSteerGearRatio = 13.3714;
     private static final Distance kWheelRadius = Inches.of(2);
 
     private static final boolean kInvertLeftSide = false;

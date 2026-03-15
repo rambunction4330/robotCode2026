@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,7 +35,7 @@ public class IndexerSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void setIndexterVelocity(AngularVelocity velocity) {
+  public void setIndexerVelocity(AngularVelocity velocity) {
     indexer.setVelocity(velocity);
   }
 
@@ -58,18 +60,20 @@ public class IndexerSubsystem extends SubsystemBase {
       indexer.getMotor().setVoltage(voltage);
   }
 
-  public Command kickAndIndex(AngularVelocity kickVel, double indexerVol){
+  public Command kickAndIndex(AngularVelocity kickVel, double indexerVel){
   return new RunCommand(
     ()-> {
       setKickerVelocity(kickVel);
-      setIndexVol(indexerVol);
+      setIndexVol(indexerVel);
     }
   );
   }
 
   public Command Stop() {
     return new RunCommand(() -> {
+      setIndexVol(0);
       indexer.stop();
+      setKickerVelocity(RotationsPerSecond.of(.2));
       kicker.stop();
     }, this);
   }

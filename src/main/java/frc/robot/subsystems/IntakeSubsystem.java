@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -37,6 +38,7 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Intake Pose", arm.getPosition().in(Rotations));
   }
 
   public void setArmPosition(Angle pos) {
@@ -61,16 +63,16 @@ public class IntakeSubsystem extends SubsystemBase {
     }, this);
   }
 
-  public Command intakeCommand(Angle pos, double velocity_RotPerMin) {
+  public Command intakeCommand(Angle pos, double velocity_RotPerSec) {
     return new RunCommand(
         () -> {
           setArmPosition(pos);
-          setRollersVelocity(velocity_RotPerMin);
+          setRollersVelocity(velocity_RotPerSec);
         }, this);
   }
 
   public Command Stop() {
-    return new RunCommand(
+    return new InstantCommand(
         () -> {
           arm.setPosition(Rotations.of(0));
           rollers.stop();

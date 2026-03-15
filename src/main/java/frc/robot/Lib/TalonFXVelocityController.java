@@ -1,5 +1,7 @@
 package frc.robot.Lib;
 
+import static edu.wpi.first.units.Units.Amps;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -74,13 +76,13 @@ public class TalonFXVelocityController {
         config.CurrentLimits.StatorCurrentLimitEnable = info.currentLimits.statorCurrentEnable;
         
         if(!(info.currentLimits.statorCurrentLimit == null)) {
-        config.CurrentLimits.StatorCurrentLimit = info.currentLimits.statorCurrentLimit.magnitude();
+        config.CurrentLimits.StatorCurrentLimit = info.currentLimits.statorCurrentLimit.in(Amps);
         }
 
         config.CurrentLimits.SupplyCurrentLimitEnable = info.currentLimits.supplyCurrentEnable;
         
         if(!(info.currentLimits.supplyCurrentLimit == null)){
-        config.CurrentLimits.SupplyCurrentLimit = info.currentLimits.supplyCurrentLimit.magnitude();
+        config.CurrentLimits.SupplyCurrentLimit = info.currentLimits.supplyCurrentLimit.in(Amps);
         }
 
         config.Feedback.SensorToMechanismRatio = info.feedBack.gearRatio;

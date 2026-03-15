@@ -29,7 +29,7 @@ public class TurretAllignCommand extends Command {
   private CommandSwerveDrivetrain drivetrain; 
   private Translation2d hubVec_Blue = new Translation2d(182.11*.0254, 158.84*.0254);
   private Translation2d hubVec_Red = new Translation2d(469.11*.0254, 158.84*.0254);
-  private Translation2d centerToTurret = new Translation2d(-5.197*.0254, -5*.0254);
+  
   private Translation2d hubVec;
   private Supplier<ChassisSpeeds> m_robotSpeedsSup;
 
@@ -40,7 +40,11 @@ public class TurretAllignCommand extends Command {
     this.drivetrain = drivetrain; 
     this.m_robotSpeedsSup = robotSpeedsSup;
     super.addRequirements(turretSubsystem);
+  }
 
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
     hubVec = hubVec_Blue;
     
     if (DriverStation.getAlliance().get() == Alliance.Red) {
@@ -48,29 +52,11 @@ public class TurretAllignCommand extends Command {
     }
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (DriverStation.getAlliance().get() == Alliance.Red) {
-      hubVec = hubVec_Red;
-    }
-
-    Rotation2d currentRobotRot = drivetrain.getState().Pose.getRotation(); 
-    Translation2d currentRobotVec = drivetrain.getState().Pose.getTranslation();
-
-    Translation2d adjustedTurretVec = centerToTurret.rotateBy(currentRobotRot);
-    adjustedTurretVec =  adjustedTurretVec.plus(currentRobotVec);
-    Translation2d distanceVec = hubVec.minus(adjustedTurretVec);
-
-    // Minus Robot Rotation from vector math angle to get the turret angle setpoint - Peine
-    Rotation2d targetRot = distanceVec.getAngle().minus(drivetrain.getState().Pose.getRotation()); 
-
-  SmartDashboard.putNumber("TargetRotTurret", targetRot.getRotations());
-  //SmartDashboard.putNumber("currentTurretPosition", turretSubsystem.getTurret().getPosition().magnitude());
+    Rotation2d targetRot = drivetrain.getRotToTarget(hubVec);
+  
     turretSubsystem.setTurretPosition(Rotations.of(-targetRot.getRotations()-.5), .12*m_robotSpeedsSup.get().omegaRadiansPerSecond);
 
   }

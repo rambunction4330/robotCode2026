@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.HootAutoReplay;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,11 +24,13 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         m_robotContainer = new RobotContainer();
+        
     }
 
     @Override
     public void robotPeriodic() {
-        m_timeAndJoystickReplay.update();
+        //m_timeAndJoystickReplay.update();
+SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
         CommandScheduler.getInstance().run(); 
     }
 

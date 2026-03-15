@@ -12,6 +12,7 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
@@ -58,10 +59,10 @@ public final class Constants {
     /// torque power applied to the motor
     static SparkMaxPositionController intakeArm = new SparkMaxPositionController(new sparkPcreateInfo(
         new sparkPMotorConfig(50, SparkLowLevel.MotorType.kBrushless, true, 0),
-        new sparkPpidConfig(2, 0, 0, 0, 0, 40, -40),
+        new sparkPpidConfig(5, 0, 0.01, 0, 0, 40, -40),
         null,
-        new sparkPrange(true, Rotations.of(0), Rotations.of(3)),
-        new sparkPfeedBack(FeedbackSensor.kPrimaryEncoder, 0.03125),
+        new sparkPrange(false, null, null),
+        new sparkPfeedBack(FeedbackSensor.kPrimaryEncoder, 1.0/32.0),
         new sparkPprofiling(false, RotationsPerSecond.of(0), RotationsPerSecondPerSecond.of(0))));
 
     static TalonFXVelocityController intakeRollers = new TalonFXVelocityController(new talonVcreateInfo(
@@ -80,20 +81,20 @@ public final class Constants {
     static TalonFXVelocityController kicker = new TalonFXVelocityController(new talonVcreateInfo(
         new talonVmotorConfig(53, talonVisInverted.INVERTED, talonVbrakeMode.NEUTRAL, -1, 1),
         new talonVpidConfig(2, 0, 0, 0, 0, 0, 0),
-        new talonVfeedBack(1), new talonVlimitsConfig(true, Amps.of(60), true, Amps.of(40))));
+        new talonVfeedBack(29.0/11.0), new talonVlimitsConfig(true, Amps.of(60), true, Amps.of(40))));
 
     /// Shooter Constants
     static TalonFXVelocityController shooter = new TalonFXVelocityController(new talonVcreateInfo(
         new talonVmotorConfig(54, talonVisInverted.INVERTED, talonVbrakeMode.NEUTRAL, -1, 1),
-        new talonVpidConfig(1, 0, 0, 0, 0, 0, 0),
+        new talonVpidConfig(.7, 0, .01, 0, .26, .54, 0),
         new talonVfeedBack((double)(2/3)), new talonVlimitsConfig(true, Amps.of(100), true, Amps.of(40))));
 
     static SparkMaxPositionController hood = new SparkMaxPositionController(new sparkPcreateInfo(
-        new sparkPMotorConfig(55, SparkLowLevel.MotorType.kBrushless, false, 40),
+        new sparkPMotorConfig(55, SparkLowLevel.MotorType.kBrushless, true, 40),
         new sparkPpidConfig(50, 0, 0, 0, 0, 1, -1),
         null,
         new sparkPrange(false, null, null),
-        new sparkPfeedBack(FeedbackSensor.kPrimaryEncoder, (1.0 / ((48.0 / 14.0) * (170.0 / 15.0)))),
+        new sparkPfeedBack(FeedbackSensor.kPrimaryEncoder, (1.0 / (3.0 * (170.0 / 15.0)))),
         new sparkPprofiling(false, RotationsPerSecond.of(0), RotationsPerSecondPerSecond.of(0))));
 
     /// Turret Constants
@@ -127,12 +128,19 @@ public final class Constants {
 
   public static void hoodMapFunc(){
    hoodMap.put(0.0, 0.0);
-   hoodMap.put(5.08, 0.1);
-
+   //hoodMap.put(5.08, 0.1);
+    hoodMap.put(1.78892, 10.43);
+    hoodMap.put(2.279, 15.0);
+    hoodMap.put(3.1385, 16.59);
+    hoodMap.put(4.0223,20.5);
   }
 
   public static void shootMapFunc(){
-    velocityMap.put(0.0, 0.0);
-    velocityMap.put(5.08, 70.0);
+    velocityMap.put(1.78892, 27.9);
+    velocityMap.put(2.279, 30.46);
+    velocityMap.put(3.1385, 34.56);
+    velocityMap.put(4.0223, 38.0);
   }
+
+  public static final Translation2d centerToTurret = new Translation2d(-5.197*.0254, -5*.0254);
 }

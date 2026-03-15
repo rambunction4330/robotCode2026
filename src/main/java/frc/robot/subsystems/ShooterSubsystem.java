@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -11,6 +13,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -38,6 +41,9 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    SmartDashboard.putNumber("Hood Encoder", hood.getPosition().in(Rotations));
+    SmartDashboard.putNumber("Hood Current", hood.sparkMax.getOutputCurrent());
   }
 
   public void setShootVelocity(AngularVelocity velocity) {
@@ -77,7 +83,8 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public Command Stop(){
-    return new RunCommand(()->{hood.stop();
+    return new InstantCommand(()->{
+    setHoodPosition(Rotations.of(0));
     shooter.stop();}, this);
   }
 
@@ -92,7 +99,10 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command shootCommand2(DoubleSupplier distance){
    return new RunCommand(()->{
     setShootVelocity(RotationsPerSecond.of(Constants.velocityMap.get(distance.getAsDouble())));
-    setHoodPosition(Rotations.of(Constants.hoodMap.get(distance.getAsDouble())));
+    setHoodPosition(Degrees.of(Constants.hoodMap.get(distance.getAsDouble())));
+
+    SmartDashboard.putNumber("Shoot Vel Targ", Constants.velocityMap.get(distance.getAsDouble()));
+    SmartDashboard.putNumber("Shoot Pose Targ", Constants.hoodMap.get(distance.getAsDouble()));
 
    }, this);
   }
